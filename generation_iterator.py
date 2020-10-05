@@ -27,7 +27,6 @@ def gen_iterator(out_path, dataset, gen_p):
     data_tupels = []
     for i, data in tqdm(enumerate(loader)):
 
-
         path = os.path.normpath(data['path'][0])
         export_path = out_path + '/generation/{}/{}/'.format(path.split(os.sep)[-2], path.split(os.sep)[-1])
 

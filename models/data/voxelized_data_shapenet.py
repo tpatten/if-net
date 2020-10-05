@@ -26,11 +26,22 @@ class VoxelizedDataset(Dataset):
         self.split = np.load(split_file)
 
         self.data = self.split[mode]
+        data_temp = []
+        available_sets = set()
+        available_sets.add('02828884')
+        available_sets.add('03636649')
+        #print('Data: {}'.format(len(self.data)))
+        for item in self.data:
+            #print(item, item.split('/')[1])
+            if item.split('/')[1] in available_sets:
+                data_temp.append(item)
+        self.data = data_temp
         self.res = res
 
         self.num_sample_points = num_sample_points
         self.batch_size = batch_size
         self.num_workers = num_workers
+        print('Num workers: {}'.format(self.num_workers))
         self.voxelized_pointcloud = voxelized_pointcloud
         self.pointcloud_samples = pointcloud_samples
 

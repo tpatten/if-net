@@ -14,7 +14,7 @@ class Generator(object):
         self.device = device
         self.resolution = resolution
         self.resolution = resolution
-        self.checkpoint_path = os.path.dirname(__file__) + '/../experiments/{}/checkpoints/'.format( exp_name)
+        self.checkpoint_path = os.path.dirname(__file__) + '/../experiments/{}/checkpoints/'.format(exp_name)
         self.load_checkpoint(checkpoint)
         self.batch_points = batch_points
 
@@ -38,6 +38,10 @@ class Generator(object):
 
     def generate_mesh(self, data):
 
+        #print('Size of inputs {}'.format(data['inputs'].size()))
+        #print('Size of grid_coords {}'.format(data['grid_coords'].size()))
+        #print('Size of occupancies {}'.format(data['occupancies'].size()))
+        #print('Size of points {}'.format(data['points'].size()))
 
         inputs = data['inputs'].to(self.device)
 
