@@ -1,20 +1,25 @@
+import os
 import models.local_model as model
-import models.data.voxelized_data_shapenet as voxelized_data
+# import models.data.voxelized_data_shapenet as voxelized_data
 import numpy as np
 import argparse
 from models.generation import Generator
-from generation_iterator import gen_iterator
+# from generation_iterator import gen_iterator
 import torch
 
 
+SHAPENET_PATH = '/home/tpatten/Code/if-net/shapenet/data/'
+
+
 def load_data(datapath, res, pointcloud_samples, num_samples, sample_sigmas, voxelized_pointcloud=True):
-    path = '/home/tpatten/Code/if-net/shapenet/data/' + datapath
+    path = os.path.join(SHAPENET_PATH, datapath)
     if not voxelized_pointcloud:
         occupancies = np.load(path + '/voxelization_{}.npy'.format(res))
         occupancies = np.unpackbits(occupancies)
         input = np.reshape(occupancies, (res,) * 3)
     else:
-        voxel_path = path + '/voxelized_point_cloud_{}res_{}points.npz'.format(res, pointcloud_samples)
+        # voxel_path = path + '/voxelized_point_cloud_{}res_{}points.npz'.format(res, pointcloud_samples)
+        voxel_path = path + '/voxelized.npz'
         occupancies = np.unpackbits(np.load(voxel_path)['compressed_occupancies'])
         input = np.reshape(occupancies, (res,) * 3)
 
@@ -23,6 +28,7 @@ def load_data(datapath, res, pointcloud_samples, num_samples, sample_sigmas, vox
     occupancies = []
 
     for i, num in enumerate(num_samples):
+        # boundary_samples_path = path + '/boundary_{}_samples.npz'.format(sample_sigmas[i])
         boundary_samples_path = path + '/boundary_{}_samples.npz'.format(sample_sigmas[i])
         boundary_samples_npz = np.load(boundary_samples_path)
         boundary_sample_points = boundary_samples_npz['points']
@@ -114,10 +120,10 @@ if __name__ == '__main__':
     num_samples = np.rint(sample_distribution * num_sample_points).astype(np.uint32)
     data_sample = load_data(args.datapath, args.res, args.pc_samples, num_samples, sample_sigmas,
                             voxelized_pointcloud=args.pointcloud)
-    print('Size of inputs {}'.format(data_sample['inputs'].size()))
-    print('Size of grid_coords {}'.format(data_sample['grid_coords'].size()))
-    print('Size of occupancies {}'.format(data_sample['occupancies'].size()))
-    print('Size of points {}'.format(data_sample['points'].size()))
+    # print('Size of inputs {}'.format(data_sample['inputs'].size()))
+    # print('Size of grid_coords {}'.format(data_sample['grid_coords'].size()))
+    # print('Size of occupancies {}'.format(data_sample['occupancies'].size()))
+    # print('Size of points {}'.format(data_sample['points'].size()))
 
     exp_name = 'i{}_dist-{}sigmas-{}v{}_m{}'.format('PC' + str(args.pc_samples) if args.pointcloud else 'Voxels',
                                                     ''.join(str(e) + '_' for e in args.sample_distribution),
@@ -128,6 +134,6 @@ if __name__ == '__main__':
                     batch_points=args.batch_points)
 
     mesh = generate_mesh(gen, data_sample)
-    export_path = '/home/tpatten/Data/'
-    mesh.export(export_path + 'surface_reconstruction.off')
+
+    mesh.export(os.path.join(SHAPENET_PATH, args.datapath, 'surface_reconstruction.off'))
 
