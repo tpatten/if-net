@@ -1,11 +1,11 @@
 import os
 import models.local_model as model
-# import models.data.voxelized_data_shapenet as voxelized_data
 import numpy as np
 import argparse
 from models.generation import Generator
-# from generation_iterator import gen_iterator
 import torch
+import json
+import open3d as o3d
 
 
 SHAPENET_PATH = '/home/tpatten/Code/if-net/shapenet/data/'
@@ -135,5 +135,27 @@ if __name__ == '__main__':
 
     mesh = generate_mesh(gen, data_sample)
 
-    mesh.export(os.path.join(SHAPENET_PATH, args.datapath, 'surface_reconstruction.off'))
+    mesh.export(os.path.join(SHAPENET_PATH, args.datapath, 'ifnet_recon.off'))
+
+    # Convert back to original coordinates
+    scale_param_file = os.path.join(SHAPENET_PATH, args.datapath, 'scale_params.json')
+    with open(scale_param_file) as json_file:
+        scale_params = json.load(json_file)
+    total_size = scale_params['total_size']
+    centers = scale_params['centers']
+    mesh.apply_scale(total_size)
+    mesh.apply_translation(centers)
+    out_file = os.path.join(SHAPENET_PATH, args.datapath, 'ifnet_recon_bop.off')
+    mesh.export(out_file)
+
+    # Remove small (noisy) parts
+    o3d_mesh = o3d.io.read_triangle_mesh(out_file)
+    triangle_clusters, cluster_n_triangles, cluster_area = (o3d_mesh.cluster_connected_triangles())
+    triangle_clusters = np.asarray(triangle_clusters)
+    cluster_n_triangles = np.asarray(cluster_n_triangles)
+    largest_cluster_idx = cluster_n_triangles.argmax()
+    triangles_to_remove = triangle_clusters != largest_cluster_idx
+    o3d_mesh.remove_triangles_by_mask(triangles_to_remove)
+    out_file = os.path.join(SHAPENET_PATH, args.datapath, 'ifnet_recon_bop_clean.off')
+    o3d.io.write_triangle_mesh(out_file, o3d_mesh)
 
