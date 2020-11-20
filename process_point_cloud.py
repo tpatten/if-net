@@ -91,10 +91,9 @@ def convert_to_scaled_off2(filename):
 '''
 
 
-def voxelized_pointcloud_sampling(dirpath, mesh):
+def voxelized_pointcloud_sampling(dirpath, mesh, num_points):
     # Variables (do not change)
     res = 128
-    num_points = 3000
     bb_min = -0.5
     bb_max = 0.5
 
@@ -229,12 +228,13 @@ def boundary_sampling2(dirpath, mesh, sigma):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Process the point cloud to usable format for IF-Net')
     parser.add_argument('-filename', type=str)
+    parser.add_argument('-pc_samples', default=3000, type=int)
     args = parser.parse_args()
 
     dirpath = os.path.dirname(args.filename)
 
     scaled_cloud = convert_to_scaled_off(args.filename)
-    voxelized_cloud_filename = voxelized_pointcloud_sampling(dirpath, scaled_cloud)
+    voxelized_cloud_filename = voxelized_pointcloud_sampling(dirpath, scaled_cloud, args.pc_samples)
     sigmas = [0.1, 0.01]
     for s in sigmas:
         boundary_sampling(dirpath, scaled_cloud, s)

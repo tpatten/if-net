@@ -24,7 +24,8 @@ RUN python3.7 -m pip install numpy==1.16.6 \
 							 future==0.18.2 \
 							 pandas==1.0.3 \
                              pymcubes==0.1.0 \
-                             tqdm
+                             tqdm \
+                             open3d
 
 # RUN python3.7 -m pip install cudatoolkit==9.0
 

@@ -156,6 +156,19 @@ if __name__ == '__main__':
     largest_cluster_idx = cluster_n_triangles.argmax()
     triangles_to_remove = triangle_clusters != largest_cluster_idx
     o3d_mesh.remove_triangles_by_mask(triangles_to_remove)
+    o3d_mesh = o3d_mesh.remove_degenerate_triangles()
+    o3d_mesh = o3d_mesh.remove_duplicated_triangles()
+    o3d_mesh = o3d_mesh.remove_duplicated_vertices()
+    o3d_mesh = o3d_mesh.remove_non_manifold_edges()
+    o3d_mesh = o3d_mesh.remove_unreferenced_vertices()
     out_file = os.path.join(SHAPENET_PATH, args.datapath, 'ifnet_recon_bop_clean.off')
     o3d.io.write_triangle_mesh(out_file, o3d_mesh)
+    #import copy
+    #for i in range(len(cluster_n_triangles)):
+    #    o3d_mesh_copy = copy.deepcopy(o3d_mesh)
+    #    cluster_idx = cluster_n_triangles[i]
+    #    triangles_to_remove = triangle_clusters != cluster_idx
+    #    o3d_mesh_copy.remove_triangles_by_mask(triangles_to_remove)
+    #    out_file = os.path.join(SHAPENET_PATH, args.datapath, 'ifnet_recon_bop_clean_' + str(i) + '.off')
+    #    o3d.io.write_triangle_mesh(out_file, o3d_mesh_copy)
 
