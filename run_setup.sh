@@ -41,7 +41,7 @@
 
 
 #SUBJS=(ABF12 BB12 GPMF12 GSF12 MC1 MC4 MDF12 SB12 ShSu12 SiBF12 SM2 SM3 SMu1 SMu40 SS1)
-SUBJS=(GPMF12)
+SUBJS=(ShSu12)
 for s in "${SUBJS[@]}"
 do
 	python3.7 process_point_cloud.py -filename /home/tpatten/Code/if-net/shapenet/data/ho3d/obj_learn/${s}_300/mesh.ply -pc_samples 300
